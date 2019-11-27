@@ -7,6 +7,7 @@ package com.pauldemarco.flutterblue;
 import android.app.Activity;
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -108,7 +109,7 @@ public class FlutterBluePlugin implements MethodCallHandler, RequestPermissionsR
                 }
             }
         };
-        mBluetoothAdapter.getProfileProxy(context, profileListener, BluetoothProfile.HEADSET);
+        mBluetoothAdapter.getProfileProxy(activity, profileListener, BluetoothProfile.HEADSET);
     }
 
     @Override
@@ -244,6 +245,7 @@ public class FlutterBluePlugin implements MethodCallHandler, RequestPermissionsR
                 if (headset != null && device.getName().equals("SP-HEADSET_ble")) {
                     log(LogLevel.DEBUG, "Connected headset and set up voice recognition");
                     headset.startVoiceRecognition(device);
+                    log(LogLevel.DEBUG, "Is headset audio enabled: " + headset.isAudioConnected(device));
                 }
                 mGattServers.put(deviceId, gattServer);
                 result.success(null);
