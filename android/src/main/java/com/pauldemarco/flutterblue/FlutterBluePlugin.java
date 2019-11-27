@@ -242,7 +242,7 @@ public class FlutterBluePlugin implements MethodCallHandler, RequestPermissionsR
                     gattServer = device.connectGatt(activity, options.getAndroidAutoConnect(), mGattCallback);
                 }
                 if (headset != null && device.getName().equals("SP-HEADSET_ble")) {
-                    log(LogLevel.DEBUG, "Connected headset and set up voice recognition")
+                    log(LogLevel.DEBUG, "Connected headset and set up voice recognition");
                     headset.startVoiceRecognition(device);
                 }
                 mGattServers.put(deviceId, gattServer);
