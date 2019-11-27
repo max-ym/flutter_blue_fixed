@@ -73,6 +73,8 @@ public class FlutterBluePlugin implements MethodCallHandler, RequestPermissionsR
     private MethodCall pendingCall;
     private Result pendingResult;
 
+    private BluetoothHeadset headset;
+
     /**
      * Plugin registration.
      */
@@ -90,6 +92,23 @@ public class FlutterBluePlugin implements MethodCallHandler, RequestPermissionsR
         this.mBluetoothAdapter = mBluetoothManager.getAdapter();
         channel.setMethodCallHandler(this);
         stateChannel.setStreamHandler(stateHandler);
+
+
+        BluetoothProfile.ServiceListener profileListener = new BluetoothProfile.ServiceListener() {
+
+            public void onServiceConnected(int profile, BluetoothProfile proxy) {
+                if (profile == BluetoothProfile.HEADSET) {
+                    headset = (BluetoothHeadset) proxy;
+                    log(LogLevel.DEBUG, "Found headset profile");
+                }
+            }
+            public void onServiceDisconnected(int profile) {
+                if (profile == BluetoothProfile.HEADSET) {
+                    headset = null;
+                }
+            }
+        };
+        mBluetoothAdapter.getProfileProxy(context, profileListener, BluetoothProfile.HEADSET);
     }
 
     @Override
@@ -221,6 +240,10 @@ public class FlutterBluePlugin implements MethodCallHandler, RequestPermissionsR
                     gattServer = device.connectGatt(activity, options.getAndroidAutoConnect(), mGattCallback, BluetoothDevice.TRANSPORT_LE);
                 } else {
                     gattServer = device.connectGatt(activity, options.getAndroidAutoConnect(), mGattCallback);
+                }
+                if (headset != null && device.getName().equals("SP-HEADSET_ble")) {
+                    log(LogLevel.DEBUG, "Connected headset and set up voice recognition")
+                    headset.startVoiceRecognition(device);
                 }
                 mGattServers.put(deviceId, gattServer);
                 result.success(null);
